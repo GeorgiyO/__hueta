@@ -80,7 +80,23 @@ public class AjaxController {
             log.info(projectsFolders[i]);
         }
 
+        int n = 100;
+
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                foo();
+            }
+        }
+
+
+
+
         return JSON.toJson(toDirectory(projectsFolders));
+    }
+
+    void foo() {
+
     }
 
     private Directory toDirectory(String[] _paths) {
