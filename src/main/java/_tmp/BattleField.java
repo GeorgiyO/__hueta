@@ -16,7 +16,7 @@ public class BattleField {
                 if (bf.isInvalidPoint(x, y))
                     return false;
 
-        return bf.isShipsCountValid();
+        return true;
     }
 
     int[][] field;
@@ -36,6 +36,7 @@ public class BattleField {
      *
      * s - checked points for gettings ships
      * d - for invalid checks
+     * there is not matter where ox or oy looks are
      *
      */
     public boolean isInvalidPoint(int x, int y) {
@@ -85,16 +86,10 @@ public class BattleField {
             if (len > 3) return true;
 
             shipsCount[len]--;
+            if (shipsCount[len] < 0) return true;
         }
 
         return false;
-    }
-
-    public boolean isShipsCountValid() {
-        for (int c : shipsCount) {
-            if (c != 0) return false;
-        }
-        return true;
     }
 
 }
