@@ -50,46 +50,64 @@ let recsEquals = (r1, r2) =>
     r1[2] === r2[2] &&
     r1[3] === r2[3];
 
+let defaultComparator = (a, b) => a > b ? 1 : a === b ? 0: -1;
+
+let first4PrimeNumbers = [2, 3, 5, 7];
+let rectHash = (r) => {
+    let res = 0;
+    for (let i = 0; i < 4; i++) {
+        res += r[i] * first4PrimeNumbers[i];
+    }
+    return res;
+}
+
 function calculate(recs) {
     let result = 0;
     let xIndexes = new Set();
     let yIndexes = new Set();
 
     // get x,y lines, where we need to cut
+
     recs.forEach(([x0, y0, x1, y1]) => {
         xIndexes.add(x0).add(x1);
         yIndexes.add(y0).add(y1);
     });
+    xIndexes = [...xIndexes].sort(defaultComparator);
+    yIndexes = [...yIndexes].sort(defaultComparator);
 
     // cut with x
+    console.time("cutting");
     for (let i = 0; i < recs.length; i++) {
-        xIndexes.forEach((x) => {
-            if (needCutX(recs[i], x)) {
-                let cuttedRecs = cutX(recs[i], x);
-                recs[i] = cuttedRecs[0];
-                recs.push(cuttedRecs[1]);
-            }
-        });
+        let x = binarySearch(xIndexes, recs[i][0], defaultComparator) + 1;
+        while (needCutX(recs[i], xIndexes[x])) {
+            let cuttedRecs = cutX(recs[i], xIndexes[x]);
+            recs[i] = cuttedRecs[0];
+            recs.push(cuttedRecs[1]);
+            x++;
+        }
     }
 
     // cut with y
     for (let i = 0; i < recs.length; i++) {
-        yIndexes.forEach((y) => {
-            if (needCutY(recs[i], y)) {
-                let cuttedRecs = cutY(recs[i], y);
-                recs[i] = cuttedRecs[0];
-                recs.push(cuttedRecs[1]);
-            }
-        });
+        let y = binarySearch(yIndexes, recs[i][1], defaultComparator) + 1;
+        while (needCutY(recs[i], yIndexes[y])) {
+            let cuttedRecs = cutY(recs[i], yIndexes[y]);
+            recs[i] = cuttedRecs[0];
+            recs.push(cuttedRecs[1]);
+            y++;
+        }
     }
+    console.timeEnd("cutting");
 
     // remove duplicates
+    console.time("removing dublicates");
     recs = recs.filter((r, i) => {
         for (let j = i + 1; j < recs.length; j++) {
             if (recsEquals(r, recs[j])) return false;
         }
         return true;
     });
+    console.timeEnd("removing dublicates");
 
     recs.forEach((r) => {
         result += (r[2] - r[0]) * (r[3] - r[1]);
@@ -151,7 +169,7 @@ class Tests {
     }
 
     threeRectangles() {
-        assertEquals(36, calculate([[3,3,8,5], [6,3,8,9],[11,6,14,12]]));
+        assertEquals(36, calculate([[6,3,8,9], [3,3,8,5], [11,6,14,12]]));
     }
 
 }
