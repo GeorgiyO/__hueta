@@ -7,6 +7,7 @@ public class BattleField {
     static final int VALID_SUM_VALUE = 20;
 
     public static boolean fieldValidator(int[][] field) {
+
         if (Arrays.stream(field).flatMapToInt(Arrays::stream).sum() != VALID_SUM_VALUE) return false;
 
         BattleField bf = new BattleField(field);
