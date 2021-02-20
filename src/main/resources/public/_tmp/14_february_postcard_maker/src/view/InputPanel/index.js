@@ -8,26 +8,38 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require("react");
 
+var _require = require("./InputForTextBlock"),
+    InputForTextBlock = _require.InputForTextBlock;
+
+var _require2 = require("./InputForPostcard"),
+    InputForPostcard = _require2.InputForPostcard;
+
 export var InputPanel = function (_React$Component) {
     _inherits(InputPanel, _React$Component);
 
     function InputPanel(props) {
         _classCallCheck(this, InputPanel);
 
-        return _possibleConstructorReturn(this, (InputPanel.__proto__ || Object.getPrototypeOf(InputPanel)).call(this, props));
+        var _this = _possibleConstructorReturn(this, (InputPanel.__proto__ || Object.getPrototypeOf(InputPanel)).call(this, props));
+
+        _this.state = props._.state;
+        props._.setState = _this.setState.bind(_this);
+        return _this;
     }
 
     _createClass(InputPanel, [{
         key: "render",
         value: function render() {
+            var textInputs = [];
+            var tbi = this.state.textBlocksInputs;
+            for (var key in tbi) {
+                textInputs.push(React.createElement(InputForTextBlock, { key: key + "ip", _: tbi[key] }));
+            }console.log(textInputs);
             return React.createElement(
                 "div",
                 { className: this.constructor.name },
-                React.createElement(
-                    "p",
-                    null,
-                    "input panel"
-                )
+                React.createElement(InputForPostcard, { _: this.props._.imageInput }),
+                textInputs
             );
         }
     }]);

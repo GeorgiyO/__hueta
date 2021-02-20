@@ -1,4 +1,6 @@
 const React = require("react");
+const _hex2rgb = require("hex-rgb");
+const hex2rgb = (hex) => _hex2rgb(hex, {format: "css"});
 
 export class TextBlock extends React.Component {
     constructor(props) {
@@ -7,32 +9,26 @@ export class TextBlock extends React.Component {
         props._.setState = this.setState.bind(this);
     }
 
-    set = (key, value) => {
-        let o = {};
-        o[key] = value;
-        this.setState(o);
-    }
-
-    setText = (text) => {this.setState({text})}
-    setFontSize = (fontSize) => {this.setState({fontSize})}
-    setColor = (color) => {this.setState({color})}
-    setBackground = (background) => {this.setState({background})}
-    setPosition = (position) => {this.setState({position})}
-    setWidth = (width) => {this.setState({width})}
-
     render() {
-        let {text, color, background, fontSize} = this.state;
-        let style = {fontSize};
-        {
-            let {r, g, b} = color;
-            style.color = `rgb(${r}, ${g}, ${b})`;
-        }
-        {
-            let {r, g, b, a} = background;
-            style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${a})`;
+        let {text, fontSize, color, background, width, position} = this.state;
+        let aHex = Number(background.a).toString(16);
+        if (aHex.length === 1) aHex = "0" + aHex;
+        let backgroundHex = background.color + aHex;
+        let style = {
+            fontSize: fontSize + "px",
+            color: hex2rgb(color),
+            background: hex2rgb(backgroundHex),
+        };
+        style[position] = "0";
+        if (position === "right" || position === "left") {
+            style.height = "100%";
+            style.width = width + "%";
+        } else {
+            style.width = "100%";
+            style.height = width + "%";
         }
         return (
-            <div style={style}>
+            <div className={this.constructor.name} style={style}>
                 {text}
             </div>
         );

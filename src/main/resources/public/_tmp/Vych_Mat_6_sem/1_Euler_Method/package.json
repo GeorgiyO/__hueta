@@ -1,24 +1,22 @@
 {
-  "name": "14_february_postcard_maker",
-  "version": "1.0.0",
+  "name": "1_euler_method",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "react-scripts start"
   },
-  "author": "Я",
+  "author": "nekogochan",
   "license": "ISC",
   "dependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-react-app": "^3.1.2",
-    "color-convert": "^1.9.3",
-    "hex-rgb": "^4.2.0",
+    "chart.js": "^2.9.4",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "^4.0.2"
   },
-  "_id": "14_february_postcard_maker@1.0.0",
   "browserslist": {
     "production": [
       ">0.2%",

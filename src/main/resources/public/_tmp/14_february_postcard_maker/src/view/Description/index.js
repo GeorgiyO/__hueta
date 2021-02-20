@@ -28,7 +28,6 @@ export var Description = function (_React$Component) {
                 header = _props$_.header,
                 text = _props$_.text;
 
-            var state = this.state;
             return React.createElement(
                 "div",
                 { className: this.constructor.name },
@@ -45,7 +44,7 @@ export var Description = function (_React$Component) {
                 React.createElement(
                     "p",
                     null,
-                    state.date
+                    this.state.date
                 )
             );
         }

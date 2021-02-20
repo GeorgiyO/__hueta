@@ -7,6 +7,10 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require("react");
+var _hex2rgb = require("hex-rgb");
+var hex2rgb = function hex2rgb(hex) {
+    return _hex2rgb(hex, { format: "css" });
+};
 
 export var TextBlock = function (_React$Component) {
     _inherits(TextBlock, _React$Component);
@@ -15,36 +19,6 @@ export var TextBlock = function (_React$Component) {
         _classCallCheck(this, TextBlock);
 
         var _this = _possibleConstructorReturn(this, (TextBlock.__proto__ || Object.getPrototypeOf(TextBlock)).call(this, props));
-
-        _this.set = function (key, value) {
-            var o = {};
-            o[key] = value;
-            _this.setState(o);
-        };
-
-        _this.setText = function (text) {
-            _this.setState({ text: text });
-        };
-
-        _this.setFontSize = function (fontSize) {
-            _this.setState({ fontSize: fontSize });
-        };
-
-        _this.setColor = function (color) {
-            _this.setState({ color: color });
-        };
-
-        _this.setBackground = function (background) {
-            _this.setState({ background: background });
-        };
-
-        _this.setPosition = function (position) {
-            _this.setState({ position: position });
-        };
-
-        _this.setWidth = function (width) {
-            _this.setState({ width: width });
-        };
 
         _this.state = props._.state;
         props._.setState = _this.setState.bind(_this);
@@ -56,29 +30,31 @@ export var TextBlock = function (_React$Component) {
         value: function render() {
             var _state = this.state,
                 text = _state.text,
+                fontSize = _state.fontSize,
                 color = _state.color,
                 background = _state.background,
-                fontSize = _state.fontSize;
+                width = _state.width,
+                position = _state.position;
 
-            var style = { fontSize: fontSize };
-            {
-                var r = color.r,
-                    g = color.g,
-                    b = color.b;
-
-                style.color = "rgb(" + r + ", " + g + ", " + b + ")";
-            }
-            {
-                var _r = background.r,
-                    _g = background.g,
-                    _b = background.b,
-                    a = background.a;
-
-                style.backgroundColor = "rgba(" + _r + ", " + _g + ", " + _b + ", " + a + ")";
+            var aHex = Number(background.a).toString(16);
+            if (aHex.length === 1) aHex = "0" + aHex;
+            var backgroundHex = background.color + aHex;
+            var style = {
+                fontSize: fontSize + "px",
+                color: hex2rgb(color),
+                background: hex2rgb(backgroundHex)
+            };
+            style[position] = "0";
+            if (position === "right" || position === "left") {
+                style.height = "100%";
+                style.width = width + "%";
+            } else {
+                style.width = "100%";
+                style.height = width + "%";
             }
             return React.createElement(
                 "div",
-                { style: style },
+                { className: this.constructor.name, style: style },
                 text
             );
         }

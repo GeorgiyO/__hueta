@@ -42,9 +42,18 @@ body {
   background-position: center;
   background-size: cover;
 }
+.Root .Workplace .Postcard .TextBlock {
+  position: absolute;
+}
 .Root .Workplace .InputPanel {
   background-color: #0f04;
   width: 400px;
+}
+.Root .Workplace .InputPanel input {
+  margin-left: 20px;
+}
+.Root .Workplace .InputPanel p {
+  margin: 4px;
 }
 
 /*# sourceMappingURL=style.css.map */

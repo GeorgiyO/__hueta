@@ -11,10 +11,6 @@ var React = require("react");
 var _require = require("./TextBlock"),
     TextBlock = _require.TextBlock;
 
-var log = function log(str) {
-    return console.log("Postcard: ", str);
-};
-
 export var Postcard = function (_React$Component) {
     _inherits(Postcard, _React$Component);
 
@@ -31,17 +27,21 @@ export var Postcard = function (_React$Component) {
     _createClass(Postcard, [{
         key: "render",
         value: function render() {
+            var _state = this.state,
+                source = _state.source,
+                textBlocks = _state.textBlocks;
+
             var style = {
-                backgroundImage: "url(" + this.state.source + ")"
+                backgroundImage: "url(" + source + ")"
             };
-            var textBlocks = this.state.textBlocks.map(function (textBlockProps) {
-                return React.createElement(TextBlock, { key: textBlockProps.id.toString(), _: textBlockProps });
-            });
-            console.log(textBlocks);
+            var tb = [];
+            for (var key in textBlocks) {
+                tb.push(React.createElement(TextBlock, { key: key + "tb", _: textBlocks[key] }));
+            }
             return React.createElement(
                 "div",
                 { className: this.constructor.name, style: style },
-                textBlocks
+                tb
             );
         }
     }]);

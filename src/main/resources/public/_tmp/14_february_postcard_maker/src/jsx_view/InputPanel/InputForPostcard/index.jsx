@@ -1,7 +1,6 @@
 const React = require("react");
 
-export class Description extends React.Component {
-
+export class InputForPostcard extends React.Component {
     constructor(props) {
         super(props);
         this.state = props._.state;
@@ -9,14 +8,11 @@ export class Description extends React.Component {
     }
 
     render() {
-        let {header, text} = this.props._;
         return (
             <div className={this.constructor.name}>
-                <h1>{header}</h1>
-                <p>{text}</p>
-                <p>{this.state.date}</p>
+                <p>Ссылочка на фоновую картиночку:</p>
+                <input type="text" value={this.state.value} onChange={this.props._.handleChange}/>
             </div>
         );
     }
-
 }
