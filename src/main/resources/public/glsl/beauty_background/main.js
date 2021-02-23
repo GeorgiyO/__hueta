@@ -1,6 +1,5 @@
 let w = window.innerWidth;
 let h = window.innerHeight;
-let s = Math.min(w, h);
 
 let scene;
 let camera;
@@ -23,7 +22,7 @@ function init() {
     renderer = new THREE.WebGLRenderer();
 
     // set up three
-    renderer.setSize(s, s);
+    renderer.setSize(w, h);
     document.body.appendChild(renderer.domElement);
     camera.position.z = 8;
 
@@ -43,17 +42,6 @@ function init() {
     canvas.position.y = h / 2;
 
     canvas.rotation.y = Math.PI;
-
-    if (!String.prototype.format) {
-        String.prototype.format = function(map) {
-            let res = "Моего ${pet} зовут ${name}";
-            map.forEach((v, k) => {
-                let arg = "${" + k + "}";
-                res = res.replaceAll(arg, v);
-            });
-            return res;
-        }
-    }      
 }
 
 function addObjects() {
@@ -64,7 +52,7 @@ function addObjects() {
 function initUniforms() {
 
     uniforms.u_resolution = {
-        value: new THREE.Vector2(s, s)
+        value: new THREE.Vector3(w, h, Math.min(w, h))
     }
 
     uniforms.u_time = {
@@ -85,23 +73,20 @@ function addEventListeners() {
 function updateUResolution() {
     let w = window.innerWidth;
     let h = window.innerHeight;
-    let s = Math.min(w, h);
-    camera.right = s;
-    camera.bottom = s;
-    renderer.setSize(s, s);
-    uniforms.u_resolution.value = new THREE.Vector2(s, s);
+    camera.right = w;
+    camera.bottom = h;
+    renderer.setSize(w, h);
+    uniforms.u_resolution.value = new THREE.Vector3(w, h, Math.min(w, h));
 }
 
 function updateUMouse(e) {
     let w = window.innerWidth;
     let h = window.innerHeight;
     let s = Math.min(w, h);
-    let dw = (w - s) / 2;
-    let dh = (h - s) / 2;
 
     uniforms.u_mouse.value = new THREE.Vector2(
-        (e.pageX - dw) / s,
-        1.0 - (e.pageY - dh) / s
+        e.pageX,
+        1.0 - e.pageY
     );
 }
 

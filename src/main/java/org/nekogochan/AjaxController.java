@@ -66,31 +66,20 @@ public class AjaxController {
     Gson JSON = new Gson();
 
     private String getPublicFilesAsJson() throws IOException {
-        Resource[] resources = new PathMatchingResourcePatternResolver().getResources("public/**/index.html");
-        String[] projectsFolders = new String[resources.length];
+        var resources = new PathMatchingResourcePatternResolver().getResources("public/**/index.html");
+        var projectsFolders = new String[resources.length];
 
-        Pattern pattern = Pattern.compile("(public\\/(.*)\\/index.html)");
+        var pattern = Pattern.compile("(public\\/(.*)\\/index.html)");
 
         for (int i = 0; i < projectsFolders.length; i++) {
-            Matcher matcher = pattern.matcher(resources[i].getURL().getPath());
+            var matcher = pattern.matcher(resources[i].getURL().getPath());
             if (matcher.find()) {
-                String str = matcher.group();
-                projectsFolders[i] = str.substring(7, str.length() - 11);
-            }
-            log.info(projectsFolders[i]);
-        }
-
-        int n = 100;
-
-
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                foo();
+                var str = matcher.group();
+                var substr = str.substring(7, str.length() - 11);
+                if (!substr.contains("node_modules"))
+                    projectsFolders[i] = substr;
             }
         }
-
-
-
 
         return JSON.toJson(toDirectory(projectsFolders));
     }

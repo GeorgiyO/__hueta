@@ -1,222 +1,94 @@
-uniform vec2 u_resolution;
-uniform float u_time;
+uniform vec3 u_resolution;
 uniform vec2 u_mouse;
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//    UTIL FUNCTIONS
-//
-
-vec2 rotate(vec2 coord, float angle) {
-    return coord * mat2(
-        cos(angle),-sin(angle),
-        sin(angle), cos(angle)
-    );
+uniform float u_time;
+vec2 rotate2D (vec2 _st, float _angle) {
+    _st -= 0.5;
+    _st =  mat2(cos(_angle),-sin(_angle),
+                sin(_angle),cos(_angle)) * _st;
+    _st += 0.5;
+    return _st;
 }
-
-vec2 move(vec2 coord, vec2 where) {
-    return coord + where;
+float random (vec2 st) {
+    return fract(sin(dot(st.xy,
+                         vec2(12.9898,78.233)))*
+        43758.5453123);
 }
-
-vec2 resize(vec2 coord, vec2 scale) {
-    return coord / scale;
-}
-vec2 resize(vec2 coord, float scale) {
-    return coord / scale;
-}
-
-vec2 toGrid(vec2 coord, vec2 scale) {
-    return fract(coord * scale);
-}
-vec2 toGrid(vec2 coord, float scale) {
-    return fract(coord * scale);
-}
-
-float random(float x) {
-    return fract(sin(x) * 6543.6544);
-}
-float random(vec2 coord) {
-    return fract(sin(dot(coord,vec2(12.9898, 78.233))) * 3425.5453);
-}
-
-float noise (in vec2 _st) {
-    vec2 i = floor(_st);
-    vec2 f = fract(_st);
-
+float noise (in vec2 st) {
+    vec2 i = floor(st);
+    vec2 f = fract(st);
     // Four corners in 2D of a tile
     float a = random(i);
     float b = random(i + vec2(1.0, 0.0));
     float c = random(i + vec2(0.0, 1.0));
     float d = random(i + vec2(1.0, 1.0));
-
-    vec2 u = f * f * (3.0 - 2.0 * f);
-
+    // Smooth Interpolation
+    // Cubic Hermine Curve.  Same as SmoothStep()
+    vec2 u = f*f*(3.0-2.0*f);
+    // u = smoothstep(0.,1.,f);
+    // Mix 4 coorners percentages
     return mix(a, b, u.x) +
             (c - a)* u.y * (1.0 - u.x) +
             (d - b) * u.x * u.y;
 }
 
-// Some useful functions
-vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
-
-float snoise(vec2 v) {
-
-    //
-    //  Description : GLSL 2D simplex noise function
-    //       Author : Ian McEwan, Ashima Arts
-    //   Maintainer : ijm
-    //      Lastmod : 20110822 (ijm)
-    //      License :
-    //   Copyright (C) 2011 Ashima Arts. All rights reserved.
-    //   Distributed under the MIT License. See LICENSE file.
-    //   https://github.com/ashima/webgl-noise
-    //
-
-    const vec4 C = vec4(0.211324865405187,
-                        0.366025403784439,
-                        -0.577350269189626,
-                        0.024390243902439);
-
-    // First corner (x0)
-    vec2 i  = floor(v + dot(v, C.yy));
-    vec2 x0 = v - i + dot(i, C.xx);
-
-    // Other two corners (x1, x2)
-    vec2 i1 = vec2(0.0);
-    i1 = (x0.x > x0.y)? vec2(1.0, 0.0):vec2(0.0, 1.0);
-    vec2 x1 = x0.xy + C.xx - i1;
-    vec2 x2 = x0.xy + C.zz;
-
-    // Do some permutations to avoid
-    // truncation effects in permutation
-    i = mod289(i);
-    vec3 p = permute(
-            permute( i.y + vec3(0.0, i1.y, 1.0))
-                + i.x + vec3(0.0, i1.x, 1.0 ));
-
-    vec3 m = max(0.5 - vec3(
-                        dot(x0,x0),
-                        dot(x1,x1),
-                        dot(x2,x2)
-                        ), 0.0);
-
-    m = m*m ;
-    m = m*m ;
-
-    vec3 x = 2.0 * fract(p * C.www) - 1.0;
-    vec3 h = abs(x) - 0.5;
-    vec3 ox = floor(x + 0.5);
-    vec3 a0 = x - ox;
-
-    m *= 1.79284291400159 - 0.85373472095314 * (a0*a0+h*h);
-
-    vec3 g = vec3(0.0);
-    g.x  = a0.x  * x0.x  + h.x  * x0.y;
-    g.yz = a0.yz * vec2(x1.x,x2.x) + h.yz * vec2(x1.y,x2.y);
-    return 130.0 * dot(m, g);
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//    MAIN CODE
-//
-
-#define PI_1_4 0.78539816339
-#define PI_1_3 1.0471975512
-#define PI_1_2 1.57079632679
-#define PI_2_3 2.09439510239
-#define PI_7_6 3.66519142919
-#define PI 3.14159265359
-#define PI_2_1 6.28318530718
-
-// STRUCTS:
-
-struct Circle {
-    vec2 center;
-    float radius;
-};
-
-float getCircle(vec2 coord, in Circle circle, float smoothValue) {
-    float d = distance(coord, circle.center);
-    return smoothstep(d, d + smoothValue, circle.radius);
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// CONSTANTS:
-
-#define BLACK vec3(0.0)
-#define WHITE vec3(1.0)
-
-#define COL_1 vec3(1.,0.494,0.)
-#define COL_2 vec3(1.,0.,0.004)
-#define COL_3 vec3(1.,0.,0.506)
-
-#define GRADIENT_COEF 0.2
-
-#define NOISE_1_VEC_2 vec2(10.0, 10.0)
-#define NOISE_2_VEC_2 vec2(2.0, 20.0)
-
-#define WAVE_COMPONENTS_COUNT 4
-
-// VARIABLES:
-
-#define NUM_OCTAVES 4
-#define DETAILS 10.0
-#define SPEED 1.0
-
-float fbm ( in vec2 st) {
+#define NUM_OCTAVES 6
+float fbm ( in vec2 _st) {
     float v = 0.0;
     float a = 0.5;
-
+    vec2 shift = vec2(100.0);
+    _st = rotate2D(_st, 0.500);
     for (int i = 0; i < NUM_OCTAVES; ++i) {
-        v += a * noise(st);
-        st *= 2.0;
+        v += a * noise(_st);
+        _st = _st * 2.0 + shift;
         a *= 0.5;
     }
     return v;
 }
 
+#define white vec3(1.0);
+#define black vec3(1.0);
+#define DWX 0.5
+
+#define COL_1 vec3(-1.5)
+
+#define COL_2 vec3(1.501, 0.0, -0.985)
+#define COL_3 vec3(-1.0, 0.0, 2.985)
+
+#define SPEED_1 0.5
+#define SPEED_2 0.2
+#define SPEED_3 0.3
+
 vec3 color;
 vec2 coord;
 
 void init() {
-    coord = gl_FragCoord.xy / u_resolution * DETAILS;
-    color = WHITE;
+    coord = gl_FragCoord.xy / u_resolution.z * 5.0 + 1.0;
 }
 
-float getFBMOpacity() {
-    #define fbm_arr_foreach for (int i = 0; i < fbm_arr.length(); i++)
-    #define _fbm fbm_arr[i]
-    float[3] fbm_arr;
+void draw() {
+    vec2 w = vec2(0.0);
+    vec2 b = vec2(0.0);
+    
+    b.x = fbm(coord + DWX * u_time * SPEED_1);
+    b.y = fbm(coord + vec2(2.0));
 
-    coord.y -= u_time;
+    w.x = fbm(coord + 0.5 * b + vec2(4.0) + SPEED_2 * u_time);
+    w.y = fbm(coord + 1.0 * b + vec2(10.0) + SPEED_3 * u_time);
+    
+    float f = fbm(coord + w);
+    
+    float cmv_1 = pow(f, 2.0) * 4.0;
+    float cmv_2 = length(w) * f;
 
-    fbm_arr[0] = fbm(coord);
-    fbm_arr[1] = fbm(fbm_arr[0] + coord + u_time) - 0.2;
-    fbm_arr[2] = fbm(fbm_arr[1] + coord) - 0.2;
+    color = mix(COL_1, COL_2, cmv_1);
+    color = mix(color, COL_3, cmv_2);
 
-    float opacity = 1.0;
-    float weaking = 0.4;
+    color = (pow(f, 3.0) + pow(f, 2.0) + f) * color;
 
-    fbm_arr_foreach {
-        opacity *= _fbm / weaking;
-    }
-
-    return opacity;
-}
-
-void setColor() {
-    float opacity = getFBMOpacity();
-
-    color = vec3(opacity);
+    gl_FragColor = vec4(color, 1.0);
 }
 
 void main() {
     init();
-    setColor();
-    gl_FragColor = vec4(color, 1.0);
+    draw();
 }
-
