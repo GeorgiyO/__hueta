@@ -1,0 +1,12 @@
+.Field .Row div {
+    width: 80px;
+    height: 80px;
+    background-color: #ddd;
+    padding: 10px;
+    margin: 10px;
+}
+
+.Field .Row {
+    display: flex;
+    flex-direction: row;
+}
