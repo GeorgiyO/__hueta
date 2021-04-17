@@ -1,134 +1,27 @@
-/**
- * Вектор в двумерном пространстве с координатами и длиной
- */
-class Vec2 {
+const fetch = require("node-fetch");
 
-    // создание вектора с аргументами длин по x,y в декартовых координатах
-    static decart (xLen, yLen) {
-        let v = new Vec2();
-        v.xLen = xLen;
-        v.yLen = yLen;
-        v.length = Math.hypot(xLen, yLen);
-        v.angle = Math.atan2(yLen, xLen);
-        return v;
-    };
-
-    // создание вектора с аргументами длины и угла поворота в полярных координатах
-    static polar (length, angle) {
-        let v = new Vec2();
-        v.length = length;
-        v.angle = angle;
-        v.xLen = length * Math.cos(angle);
-        v.yLen = length * Math.sin(angle);
-        return v;
-    }
-
-    /**
-     * Вычисляет скаляр между двумя векторами
-     * @param {Vec2} vec - вектор, с которым вычисляется скаляр
-     * @returns {number} - скаляр
-     */
-    scalar(vec) {
-        return (
-            this.length *
-            vec.length *
-            Math.cos(vec.angle - this.angle)
-        );
-    }
-
-    /**
-     * Вычисляет проекцию вектора на вектор
-     * @param vec
-     * @returns {Vec2} - полученная проекция
-     */
-    projectionTo(vec) {
-        let resultLength = this.scalar(vec) / vec.length;
-        return Vec2.polar(resultLength, vec.angle);
-    }
-
-    /**
-     * Вычисление матрицы Грема:
-     * https://ru.wikipedia.org/wiki/%D0%9E%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B8%D1%82%D0%B5%D0%BB%D1%8C_%D0%93%D1%80%D0%B0%D0%BC%D0%B0
-     * @param {Vec2} v1 и
-     * @param {Vec2} v2 вектора, для которых будет вычисляться матрица
-     * @returns {{number}[][]} - матрица Грема
-     */
-    static gramianMatrix(v1, v2) {
-        return [
-            [v1.scalar(v1), v1.scalar(v2)],
-            [v2.scalar(v1), v2.scalar(v2)]
-        ];
-    }
-}
-
-// допустимая погрешность в тестах
-const ALLOWABLE_ERROR = 0.0001;
-
-scalarTests();
-grammianMatrixTests();
-projectionTests();
-
-// функция для проверки значений. Если false - появится ошибка
-function assertEquals(a, b) {
-    if (Math.abs(a - b) > ALLOWABLE_ERROR)
-        throw new Error(`${a} !== ${b}`);
-}
-
-function scalarTests() {
-    // примеры взяты отсюда
-    // http://mathprofi.ru/skaljarnoe_proizvedenie_vektorov.html
-
-    let v1 = Vec2.polar(2, 0);
-    let v2 = Vec2.polar(5, Math.PI / 6);
-
-    assertEquals(5 * Math.sqrt(3), v1.scalar(v2));
-
-    v1.length = 3;
-    v2.length = Math.sqrt(2);
-    v2.angle = Math.PI * 0.75;
-
-    assertEquals(-3, v1.scalar(v2));
-
-    passTestLog("grammianMatrixTests");
-}
-
-function grammianMatrixTests() {
-    // т.к. в интернете примеров найдено не было, результаты выполнения
-    // функции сравниваются с ручным расчетом
-
-    let v1 = Vec2.polar(2, 0);
-    let v2 = Vec2.polar(5, Math.PI / 6);
-    let result = Vec2.gramianMatrix(v1, v2);
-
-    let excepted = [
-        [4, 5 * Math.sqrt(3)],
-        [5 * Math.sqrt(3), 25]
-    ];
-
-    for (let i = 0; i < 2; i++) {
-        for (let j = 0; j < 2; j++) {
-            assertEquals(excepted[i][j], result[i][j]);
-        }
-    }
-
-    passTestLog("grammianMatrixTests");
-}
-
-function projectionTests() {
-    // примеры для тестов взяты отсюда:
-    // https://ru.onlinemschool.com/math/library/vector/projection/
-
-    let v1 = Vec2.decart(1, 2);
-    let v2 = Vec2.decart(3, 4);
-
-    let res = v1.projectionTo(v2);
-
-    assertEquals(2.2, res.length);
-    assertEquals(v2.angle, res.angle);
-
-    passTestLog("projectionTests");
-}
-
-function passTestLog(testName) {
-    console.log(`Тест ${testName} завершен без ошибок`);
-}
+fetch("https://portal3.sstu.ru/Facult/IETIP/MFPIT-IBS/10.03.01/B.1.1.30/Lists/42/NewForm.aspx?RootFolder=%2fFacult%2fIETIP%2fMFPIT%2dIBS%2f10%2e03%2e01%2fB%2e1%2e1%2e30%2fLists%2f42%2f%d0%9b%d0%b5%d0%ba%d1%86%d0%b8%d1%8f%2030%2e03%2e2021&ContentTypeId=0x0107&DiscussionParentID=486&Source=https%3A%2F%2Fportal3%2Esstu%2Eru%2FFacult%2FIETIP%2FMFPIT%2DIBS%2F10%2E03%2E01%2FB%2E1%2E1%2E30%2FLists%2F42%2FFlat%2Easpx%3FRootFolder%3D%252fFacult%252fIETIP%252fMFPIT%252dIBS%252f10%252e03%252e01%252fB%252e1%252e1%252e30%252fLists%252f42%252f%25d0%259b%25d0%25b5%25d0%25ba%25d1%2586%25d0%25b8%25d1%258f%252030%252e03%252e2021%26FolderCTID%3D0x01200200B008980FFD9AFE4AB3A8CB592B19F85A", {
+    "headers": {
+        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+        "accept-language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7,ja;q=0.6",
+        "cache-control": "max-age=0",
+        "content-type": "multipart/form-data; boundary=----WebKitFormBoundarymBcBT0HtmdCZ060g",
+        "sec-ch-ua": "\"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-fetch-dest": "document",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-site": "same-origin",
+        "sec-fetch-user": "?1",
+        "upgrade-insecure-requests": "1"
+    },
+    "referrer": "https://portal3.sstu.ru/Facult/IETIP/MFPIT-IBS/10.03.01/B.1.1.30/Lists/42/NewForm.aspx?RootFolder=%2fFacult%2fIETIP%2fMFPIT%2dIBS%2f10%2e03%2e01%2fB%2e1%2e1%2e30%2fLists%2f42%2f%d0%9b%d0%b5%d0%ba%d1%86%d0%b8%d1%8f%2030%2e03%2e2021&ContentTypeId=0x0107&DiscussionParentID=486&Source=https%3A%2F%2Fportal3%2Esstu%2Eru%2FFacult%2FIETIP%2FMFPIT%2DIBS%2F10%2E03%2E01%2FB%2E1%2E1%2E30%2FLists%2F42%2FFlat%2Easpx%3FRootFolder%3D%252fFacult%252fIETIP%252fMFPIT%252dIBS%252f10%252e03%252e01%252fB%252e1%252e1%252e30%252fLists%252f42%252f%25d0%259b%25d0%25b5%25d0%25ba%25d1%2586%25d0%25b8%25d1%258f%252030%252e03%252e2021%26FolderCTID%3D0x01200200B008980FFD9AFE4AB3A8CB592B19F85A",
+    "referrerPolicy": "strict-origin-when-cross-origin",
+    "body": "------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"MSO_PageHashCode\"\r\n\r\n33-1887347170\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"MSOWebPartPage_PostbackSource\"\r\n\r\n\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"MSOTlPn_SelectedWpId\"\r\n\r\n\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"MSOTlPn_View\"\r\n\r\n0\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"MSOTlPn_ShowSettings\"\r\n\r\nFalse\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"MSOGallery_SelectedLibrary\"\r\n\r\n\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"MSOGallery_FilterString\"\r\n\r\n\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"MSOTlPn_Button\"\r\n\r\nnone\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"__EVENTTARGET\"\r\n\r\nctl00$m$g_b4d616e0_3956_4938_b968_245a326305d7$ctl00$toolBarTbl$RightRptControls$ctl00$ctl00$diidIOSaveItem\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"__EVENTARGUMENT\"\r\n\r\n\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"__REQUESTDIGEST\"\r\n\r\n0xF1BD92817A83D6993BF2930AE17FF231EE0DA70F768386F93256F90C090EFAB810E1167D96E21E7E14C70AE7F3F2114D69C95826DA9B680BF2268D97F2000175,30 Mar 2021 01:03:13 -0000\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"MSOSPWebPartManager_DisplayModeName\"\r\n\r\nBrowse\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"MSOWebPartPage_Shared\"\r\n\r\n\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"MSOLayout_LayoutChanges\"\r\n\r\n\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"MSOLayout_InDesignMode\"\r\n\r\n\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"MSOSPWebPartManager_OldDisplayModeName\"\r\n\r\nBrowse\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"MSOSPWebPartManager_StartWebPartEditingName\"\r\n\r\nfalse\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"__VIEWSTATE\"\r\n\r\n/wEPDwUJNjgxOTI1NzMxD2QWAmYPZBYCZg9kFgICAw8WAh4HZW5jdHlwZQUTbXVsdGlwYXJ0L2Zvcm0tZGF0YRYKAgEPZBYCBSZnX2I0ZDYxNmUwXzM5NTZfNDkzOF9iOTY4XzI0NWEzMjYzMDVkNw9kFgJmD2QWEAIDD2QWAgIBD2QWBgIBDxYCHgdWaXNpYmxlaGQCAw9kFgJmD2QWAgIDDw8WBB4NT25DbGllbnRDbGljawUhaWYgKCFQcmVTYXZlSXRlbSgpKSByZXR1cm4gZmFsc2U7HghUYWJJbmRleAEAAGRkAgUPZBYCZg9kFgICAw8PFgYeCUFjY2Vzc0tleQUBQx4EVGV4dAUM0J7RgtC80LXQvdCwHwIF/gNTVFNOYXZpZ2F0ZSgnaHR0cHM6XHUwMDJmXHUwMDJmcG9ydGFsMy5zc3R1LnJ1XHUwMDJmRmFjdWx0XHUwMDJmSUVUSVBcdTAwMmZNRlBJVC1JQlNcdTAwMmYxMC4wMy4wMVx1MDAyZkIuMS4xLjMwXHUwMDJmTGlzdHNcdTAwMmY0Mlx1MDAyZkZsYXQuYXNweD9Sb290Rm9sZGVyPVx1MDAyNTJmRmFjdWx0XHUwMDI1MmZJRVRJUFx1MDAyNTJmTUZQSVRcdTAwMjUyZElCU1x1MDAyNTJmMTBcdTAwMjUyZTAzXHUwMDI1MmUwMVx1MDAyNTJmQlx1MDAyNTJlMVx1MDAyNTJlMVx1MDAyNTJlMzBcdTAwMjUyZkxpc3RzXHUwMDI1MmY0Mlx1MDAyNTJmXHUwMDI1ZDBcdTAwMjU5Ylx1MDAyNWQwXHUwMDI1YjVcdTAwMjVkMFx1MDAyNWJhXHUwMDI1ZDFcdTAwMjU4Nlx1MDAyNWQwXHUwMDI1YjhcdTAwMjVkMVx1MDAyNThmXHUwMDI1MjAzMFx1MDAyNTJlMDNcdTAwMjUyZTIwMjFcdTAwMjZGb2xkZXJDVElEPTB4MDEyMDAyMDBCMDA4OTgwRkZEOUFGRTRBQjNBOENCNTkyQjE5Rjg1QScpO3JldHVybiBmYWxzZTtkZAIFD2QWAmYPZBYCAgEPZBYEZg9kFgICAQ8PFg4fBQUX0JLQu9C+0LbQuNGC0Ywg0YTQsNC50LseCEltYWdlVXJsBR0vX2xheW91dHMvaW1hZ2VzL2F0dGFjaHRiLmdpZh8EBQFJHgtOYXZpZ2F0ZVVybAUdamF2YXNjcmlwdDpVcGxvYWRBdHRhY2htZW50KCkfAgUeamF2YXNjcmlwdDpVcGxvYWRBdHRhY2htZW50KCk7HhFQZXJtaXNzaW9uQ29udGV4dAspigFNaWNyb3NvZnQuU2hhcmVQb2ludC5VdGlsaXRpZXMuUGVybWlzc2lvbkNvbnRleHQsIE1pY3Jvc29mdC5TaGFyZVBvaW50LCBWZXJzaW9uPTEyLjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPTcxZTliY2UxMTFlOTQyOWMEHgtQZXJtaXNzaW9ucygpgAFNaWNyb3NvZnQuU2hhcmVQb2ludC5TUEJhc2VQZXJtaXNzaW9ucywgTWljcm9zb2Z0LlNoYXJlUG9pbnQsIFZlcnNpb249MTIuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49NzFlOWJjZTExMWU5NDI5YwxBZGRMaXN0SXRlbXNkZAIBD2QWAmYPFgIfAWhkAgkPZBYCZg9kFgICAQ9kFgJmD2QWAgIJDxYCHhNQcmV2aW91c0NvbnRyb2xNb2RlCymIAU1pY3Jvc29mdC5TaGFyZVBvaW50LldlYkNvbnRyb2xzLlNQQ29udHJvbE1vZGUsIE1pY3Jvc29mdC5TaGFyZVBvaW50LCBWZXJzaW9uPTEyLjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPTcxZTliY2UxMTFlOTQyOWMDFgJmDxYCHwoLKwYDZAILD2QWBGYPZBYCAgEPZBYCZg9kFgICCQ8WAh8KCysGAxYCZg8WAh8KCysGAxYCZg9kFgICAQ9kFgICAQ8PFgofAwEAAB4IQ3NzQ2xhc3MFB21zLWxvbmceB1Rvb2xUaXAFG9Ce0YHQvdC+0LLQvdC+0Lkg0YLQtdC60YHRgh4EUm93cwIPHgRfIVNCAgIWAh4DZGlyBQRub25lZAIBD2QWAgIBD2QWAmYPZBYCAgkPFgIfCgsrBgMWAmYPFgIfCgsrBgMWAmYPZBYCAgEPDxYKHglNYXhMZW5ndGgC/wEfAwEAAB8LBQdtcy1sb25nHwwFCtCS0YDQtdC80Y8fDgICZGQCDQ9kFgJmD2QWBAIDDxYCHwoLKwYBFgJmDxYCHwoLKwYBZAIFDxYCHwoLKwYBFgJmDxYCHwoLKwYBZAIPD2QWAmYPZBYCAgMPFgIfCgsrBgNkAhMPFgYfCgsrBgMeEVBhcmVudFRocmVhZEluZGV4BS4weDAxRDhFQzJGRTc3MDA3Njc3OTRFOEZCNDQ5QzRCOTcwMzhDRjNFMzFCMzBFHg5QYXJlbnRGb2xkZXJJZALmA2QCFw9kFgRmD2QWAgIBD2QWAmYPZBYEAgEPZBYEAgEPFgIfCgsrBgEWAmYPFgIfCgsrBgFkAgMPFgIfCgsrBgEWAmYPFgIfCgsrBgFkAgMPZBYEAgEPFgIfCgsrBgEWAmYPFgIfCgsrBgFkAgMPFgIfCgsrBgEWAmYPFgIfCgsrBgFkAgEPZBYEAgEPZBYCZg9kFgICAw8PFgQfAgUhaWYgKCFQcmVTYXZlSXRlbSgpKSByZXR1cm4gZmFsc2U7HwMBAABkZAIDD2QWAmYPZBYCAgMPDxYGHwQFAUMfBQUM0J7RgtC80LXQvdCwHwIF/gNTVFNOYXZpZ2F0ZSgnaHR0cHM6XHUwMDJmXHUwMDJmcG9ydGFsMy5zc3R1LnJ1XHUwMDJmRmFjdWx0XHUwMDJmSUVUSVBcdTAwMmZNRlBJVC1JQlNcdTAwMmYxMC4wMy4wMVx1MDAyZkIuMS4xLjMwXHUwMDJmTGlzdHNcdTAwMmY0Mlx1MDAyZkZsYXQuYXNweD9Sb290Rm9sZGVyPVx1MDAyNTJmRmFjdWx0XHUwMDI1MmZJRVRJUFx1MDAyNTJmTUZQSVRcdTAwMjUyZElCU1x1MDAyNTJmMTBcdTAwMjUyZTAzXHUwMDI1MmUwMVx1MDAyNTJmQlx1MDAyNTJlMVx1MDAyNTJlMVx1MDAyNTJlMzBcdTAwMjUyZkxpc3RzXHUwMDI1MmY0Mlx1MDAyNTJmXHUwMDI1ZDBcdTAwMjU5Ylx1MDAyNWQwXHUwMDI1YjVcdTAwMjVkMFx1MDAyNWJhXHUwMDI1ZDFcdTAwMjU4Nlx1MDAyNWQwXHUwMDI1YjhcdTAwMjVkMVx1MDAyNThmXHUwMDI1MjAzMFx1MDAyNTJlMDNcdTAwMjUyZTIwMjFcdTAwMjZGb2xkZXJDVElEPTB4MDEyMDAyMDBCMDA4OTgwRkZEOUFGRTRBQjNBOENCNTkyQjE5Rjg1QScpO3JldHVybiBmYWxzZTtkZAIDD2QWBAIND2QWAmYPZBYGAgEPFgIfBQUmPHNwYW4gc3R5bGU9J3BhZGRpbmctbGVmdDozcHgnPjwvc3Bhbj5kAgMPDxYEHwUFD9Cc0L7QuSDRg9C30LXQux8HBTBodHRwczovL3NzdHUtaW9zMy1paXM6MzUwMzgvX2xheW91dHMvTXlTaXRlLmFzcHhkZAIFDxYCHwUFOTxzcGFuIHN0eWxlPSdwYWRkaW5nLWxlZnQ6NHB4O3BhZGRpbmctcmlnaHQ6M3B4Jz58PC9zcGFuPmQCDw9kFgJmD2QWAgIDDxYCHwUFAXxkAgkPZBYCAgEPZBYCZg9kFgICAg8PZBYCHgVjbGFzcwUYbXMtc2J0YWJsZSBtcy1zYnRhYmxlLWV4ZAILD2QWAgIDDxYCHwFoFgJmD2QWBAICD2QWBgIBDxYCHwFoZAIDDxYCHwFoZAIFDxYCHwFoZAIDDw8WAh8EBQEvZGQCLw9kFgICBA9kFgICAQ9kFgJmDw8WAh8BaGRkGAEFRWN0bDAwJFBsYWNlSG9sZGVyVG9wTmF2QmFyJFBsYWNlSG9sZGVySG9yaXpvbnRhbE5hdiRUb3BOYXZpZ2F0aW9uTWVudQ8PZAVv0JjQvdGE0L7RgNC80LDRhtC40L7QvdC90L4t0L7QsdGA0LDQt9C+0LLQsNGC0LXQu9GM0L3QsNGPINGB0YDQtdC00LAg0KHQk9Ci0KMgICjQpNCT0J7QoS0zKylc0JjQvdGB0YLQuNGC0YPRgtGLZKCjamGxKGXbInTd8eTBm/NLsUwu\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"__VIEWSTATEGENERATOR\"\r\n\r\nA4FA7CAF\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"__EVENTVALIDATION\"\r\n\r\n/wEWEAKoqI75CAKpn5bCCwLEiLTXBQK2lojgDgLVxZG/BAL5zYOUAgLqo/WeCQLg8Za2BQLw+73ECwKX4/CBBwKSiebNCgK0xsmBDgKU8tWrBwKfmsfjBwKZl7fXCgKGx5DeCkddIWnVe34BWHEDz+064kDaKjQj\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"ctl00$PlaceHolderSearchArea$ctl01$ctl00\"\r\n\r\nhttps://portal3.sstu.ru/Facult/IETIP/MFPIT-IBS/10.03.01/B.1.1.30\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"ctl00$PlaceHolderSearchArea$ctl01$ctl01\"\r\n\r\nhttps://portal3.sstu.ru/Facult/IETIP/MFPIT-IBS/10.03.01/B.1.1.30/Lists/42\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"ctl00$PlaceHolderSearchArea$ctl01$SBScopesDDL\"\r\n\r\n\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"InputKeywords\"\r\n\r\n\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"ctl00$m$g_b4d616e0_3956_4938_b968_245a326305d7$ctl00$ctl04$ctl00$ctl00$ctl00$ctl04$ctl00$ctl00$TextField\"\r\n\r\nСилантьев Г.С.\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"ctl00$m$g_b4d616e0_3956_4938_b968_245a326305d7$ctl00$ctl04$ctl00$ctl00$ctl00$ctl04$ctl00$ctl00$TextField_spSave\"\r\n\r\n\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"ctl00$m$g_b4d616e0_3956_4938_b968_245a326305d7$ctl00$ctl04$ctl01$ctl00$ctl00$ctl04$ctl00$ctl00$TextField\"\r\n\r\n9:45\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"ctl00$m$g_b4d616e0_3956_4938_b968_245a326305d7$ctl00$ctl07$ctl00$owshiddenversion\"\r\n\r\n\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"attachmentsToBeRemovedFromServer\"\r\n\r\n\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"RectGifUrl\"\r\n\r\n/_layouts/images/rect.gif\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"fileupload0\"; filename=\"\"\r\nContent-Type: application/octet-stream\r\n\r\n\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"__spDummyText1\"\r\n\r\n\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g\r\nContent-Disposition: form-data; name=\"__spDummyText2\"\r\n\r\n\r\n------WebKitFormBoundarymBcBT0HtmdCZ060g--\r\n",
+    "method": "POST",
+    "mode": "cors",
+    "credentials": "include"
+}).then((res) => {
+    console.log(res);
+}).catch((e) => {
+    console.log(e);
+});

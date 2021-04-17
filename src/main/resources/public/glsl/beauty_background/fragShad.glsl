@@ -55,8 +55,8 @@ float fbm ( in vec2 _st) {
 #define COL_3 vec3(-1.0, 0.0, 2.985)
 
 #define SPEED_1 0.5
-#define SPEED_2 0.2
-#define SPEED_3 0.3
+#define SPEED_2 -0.4
+#define SPEED_3 -0.3
 
 vec3 color;
 vec2 coord;
